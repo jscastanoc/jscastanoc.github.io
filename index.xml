@@ -1,87 +1,64 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>_index on Dr. Sebastian Castano</title>
-    <link>https://jscastanoc.github.io/</link>
-    <description>Recent content in _index on Dr. Sebastian Castano</description>
+    <title>Dr. Sebastian Castano</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on Dr. Sebastian Castano</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 20 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://jscastanoc.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>about</title>
-      <link>https://jscastanoc.github.io/about/</link>
+      <title>About</title>
+      <link>http://localhost:1313/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://jscastanoc.github.io/about/</guid>
-      <description>&lt;style&gt;
-  .columns {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .columns--regular .column {
-    flex: 1 1 30%;
-  }
-  .columns--large .column {
-    flex: 1 1 45%;
-  }
-  .columns--small .column {
-    flex: 1 1 20%;
-  }
-  @media (max-width: 768px) {
-    .columns .column {
-      flex: 1 1 100%;
-    }
-  }
-&lt;/style&gt;
-
-&lt;div class=&#34;columns columns--regular&#34;&gt;
-    &lt;div class=&#34;column&#34;&gt;
-      &lt;h1 id=&#34;who-am-i&#34;&gt;Who am I?&lt;/h1&gt;
-&lt;p&gt;I am Sebastian, a freelance data scientist, AI/ML expert, and tech lead. I have a PhD in machine learning and neuroscience from the University of Freiburg (Germany), and a background in electronics engineering.&lt;/p&gt;</description>
-      <content>
-
-&lt;style&gt;
-  .columns {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .columns--regular .column {
-    flex: 1 1 30%;
-  }
-  .columns--large .column {
-    flex: 1 1 45%;
-  }
-  .columns--small .column {
-    flex: 1 1 20%;
-  }
-  @media (max-width: 768px) {
-    .columns .column {
-      flex: 1 1 100%;
-    }
-  }
-&lt;/style&gt;
-
-&lt;div class=&#34;columns columns--regular&#34;&gt;
-    &lt;div class=&#34;column&#34;&gt;
-      &lt;h1 id=&#34;who-am-i&#34;&gt;Who am I?&lt;/h1&gt;
-&lt;p&gt;I am Sebastian, a freelance data scientist, AI/ML expert, and tech lead. I have a PhD in machine learning and neuroscience from the University of Freiburg (Germany), and a background in electronics engineering.&lt;/p&gt;&lt;/div&gt;
-    &lt;div class=&#34;column&#34;&gt;
-      &lt;img src=&#34;./resized_me.jpeg&#34;  alt=&#34;Hello Friend&#34;  class=&#34;center&#34;  style=&#34;border-radius: 8px;width: 200px&#34;    /&gt;
-&lt;/div&gt;
-&lt;/div&gt;
+      <guid>http://localhost:1313/about/</guid>
+      <description>&lt;h1 id=&#34;who-am-i&#34;&gt;Who am I?&lt;/h1&gt;
+&lt;p&gt;I am Sebastian, a freelance data scientist, AI/ML expert, and tech lead. I have a PhD in machine learning and neuroscience from the University of Freiburg (Germany), and a background in electronics engineering.&lt;/p&gt;
+&lt;h1 id=&#34;what-experience-do-i-bring&#34;&gt;What experience do I bring?&lt;/h1&gt;
+&lt;p&gt;Over the past 10 years, I have worked across academia, corporate, and startups, bringing AI/ML solutions to life across a wide range of domains&amp;mdash;from developing cutting-edge, clinical-grade brain-computer interfaces (feel free to check out my &lt;a href=&#34;https://scholar.google.com/citations?user=Ge0wai4AAAAJ&amp;hl=en&#34;&gt;publications&lt;/a&gt;, if you are curious), to handling massive datasets for building AI/ML products in corporate environment, and giving non-technical teams the insights they need to make smart decisions at PepsiCo.&lt;/p&gt;</description>
+      <content>&lt;h1 id=&#34;who-am-i&#34;&gt;Who am I?&lt;/h1&gt;
+&lt;p&gt;I am Sebastian, a freelance data scientist, AI/ML expert, and tech lead. I have a PhD in machine learning and neuroscience from the University of Freiburg (Germany), and a background in electronics engineering.&lt;/p&gt;
 &lt;h1 id=&#34;what-experience-do-i-bring&#34;&gt;What experience do I bring?&lt;/h1&gt;
 &lt;p&gt;Over the past 10 years, I have worked across academia, corporate, and startups, bringing AI/ML solutions to life across a wide range of domains&amp;mdash;from developing cutting-edge, clinical-grade brain-computer interfaces (feel free to check out my &lt;a href=&#34;https://scholar.google.com/citations?user=Ge0wai4AAAAJ&amp;hl=en&#34;&gt;publications&lt;/a&gt;, if you are curious), to handling massive datasets for building AI/ML products in corporate environment, and giving non-technical teams the insights they need to make smart decisions at PepsiCo.&lt;/p&gt;
 &lt;h1 id=&#34;who-do-i-work-with&#34;&gt;Who do I work with?&lt;/h1&gt;
 &lt;p&gt;I work with companies to identify valuable (and quantifiable!) AI/ML opportunities, translating business problems into technical designs, developing proof-of-concepts, and building the teams and infrastructure needed to deploy scalable solutions into production.&lt;/p&gt;
-&lt;p&gt;also work with existing tech teams, providing support on the R&amp;amp;D-heavy side of AI/ML  and data science projects.&lt;/p&gt;
+&lt;p&gt;I also work with existing tech teams, providing support on the R&amp;amp;D-heavy side of AI/ML  and data science projects.&lt;/p&gt;
 &lt;h1 id=&#34;what-am-i-really-good-at&#34;&gt;What am I really good at?&lt;/h1&gt;
 &lt;p&gt;While I have significant experience across a wide range of ML techniques, from classic to deep learning models for image, audio, text, and all sorts of data (even brain data)&amp;mdash;both teaching as well as in real-world scenarios&amp;mdash;, I have particularly deep expertise in time-series analysis and using AI/ML in data-scarce environments.&lt;/p&gt;
 &lt;p&gt;I also love tinkering around with hardware prototypes.&lt;/p&gt;
 &lt;h1 id=&#34;about-my-working-style&#34;&gt;About my working style&lt;/h1&gt;
 &lt;p&gt;People I work with can expect a problem solver and a builder, with an impact/value-driven approach. I bring deep technical knowledge, scientific rigor, and a strong desire to understand business/domain specific needs and constraints. I enjoy working in fast-paced, interdisciplinary environments where learning fast and cross-functional teamwork are key. I also like mentoring more junior colleagues&amp;mdash;I think I am a good communicator and love to help others grow. Finally, if you’re into it, I’m always up for geeking out about drums, mountains, or psychology.&lt;/p&gt;
 &lt;p&gt;Feel free to reach out, either about specific projects or just to chat. I am always more than happy to connect.&lt;/p&gt;
+</content>
+    </item>
+    
+    <item>
+      <title>Projects</title>
+      <link>http://localhost:1313/projects/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/projects/</guid>
+      <description>&lt;p&gt;🚧 Under Construction 🚧 🏗️&lt;/p&gt;</description>
+      <content>&lt;p&gt;🚧 Under Construction 🚧 🏗️&lt;/p&gt;
+</content>
+    </item>
+    
+    <item>
+      <title>Publications</title>
+      <link>http://localhost:1313/pubs/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/pubs/</guid>
+      <description>&lt;p&gt;Here are some highlights. You can find the full list &lt;a href=&#34;https://scholar.google.com/citations?view_op=list_works&amp;hl=en&amp;hl=en&amp;user=Ge0wai4AAAAJ&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Castaño-Candamil et al. (2020). A pilot study on data-driven adaptive deep brain stimulation in chronically implanted essential tremor patients. &lt;em&gt;Frontiers in Human Neuroscience, 14&lt;/em&gt;, 541625. &lt;a href=&#34;https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2020.541625/full&#34;&gt;Link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Castaño-Candamil et al. (2015). Solving the EEG inverse problem based on space–time–frequency structured sparsity constraints. &lt;em&gt;NeuroImage&lt;/em&gt;, 118, 598-612. &lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S1053811915004346&#34;&gt;Link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Castaño-Candamil et al. (2020). Identifying controllable cortical neural markers with machine learning for adaptive deep brain stimulation in Parkinson’s disease. &lt;em&gt;NeuroImage: Clinical, 28&lt;/em&gt;, 102376. &lt;a href=&#34;https://www.sciencedirect.com/science/article/pii/S2213158220302138&#34;&gt;Link&lt;/a&gt;&lt;/p&gt;</description>
+      <content>&lt;p&gt;Here are some highlights. You can find the full list &lt;a href=&#34;https://scholar.google.com/citations?view_op=list_works&amp;hl=en&amp;hl=en&amp;user=Ge0wai4AAAAJ&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Castaño-Candamil et al. (2020). A pilot study on data-driven adaptive deep brain stimulation in chronically implanted essential tremor patients. &lt;em&gt;Frontiers in Human Neuroscience, 14&lt;/em&gt;, 541625. &lt;a href=&#34;https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2020.541625/full&#34;&gt;Link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Castaño-Candamil et al. (2015). Solving the EEG inverse problem based on space–time–frequency structured sparsity constraints. &lt;em&gt;NeuroImage&lt;/em&gt;, 118, 598-612. &lt;a href=&#34;https://www.sciencedirect.com/science/article/abs/pii/S1053811915004346&#34;&gt;Link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Castaño-Candamil et al. (2020). Identifying controllable cortical neural markers with machine learning for adaptive deep brain stimulation in Parkinson’s disease. &lt;em&gt;NeuroImage: Clinical, 28&lt;/em&gt;, 102376. &lt;a href=&#34;https://www.sciencedirect.com/science/article/pii/S2213158220302138&#34;&gt;Link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Castaño-Candamil et al. (2019). Post-hoc labeling of arbitrary M/EEG recordings for data-efficient evaluation of neural decoding methods. &lt;em&gt;Frontiers in Neuroinformatics, 13&lt;/em&gt;, 55. &lt;a href=&#34;https://www.frontiersin.org/journals/neuroinformatics/articles/10.3389/fninf.2019.00055/full&#34;&gt;Link&lt;/a&gt;&lt;/p&gt;
 </content>
     </item>
     

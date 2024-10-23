@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Blogs on Dr. Sebastian Castano</title>
-    <link>https://jscastanoc.github.io/blog/</link>
-    <description>Recent content in Blogs on Dr. Sebastian Castano</description>
+    <title>Dr. Sebastian Castano</title>
+    <link>http://localhost:1313/blog/</link>
+    <description>Recent content on Dr. Sebastian Castano</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 20 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://jscastanoc.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/blog/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
