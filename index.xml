@@ -2,37 +2,268 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>_index on Dr. Sebastian Castano</title>
-    <link>https://jscastanoc.github.io/</link>
+    <link>http://localhost:1313/</link>
     <description>Recent content in _index on Dr. Sebastian Castano</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 20 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://jscastanoc.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>E2B and code interpreter environments</title>
+      <link>http://localhost:1313/blog/e2b-and-code-interpreter-environments/</link>
+      <pubDate>Sun, 20 Oct 2024 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/blog/e2b-and-code-interpreter-environments/</guid>
+      <description>&lt;p&gt;In this post, we will explore two options for secure execution of AI-generated code: &lt;a href=&#34;https://e2b.dev&#34;&gt;E2B&lt;/a&gt;, a cloud-based platform using microVMs, and &lt;a href=&#34;https://github.com/Jonathan-Adly/AgentRun&#34;&gt;AgentRun&lt;/a&gt;, which combines Docker-based execution with safety mechanisms for lightweight local development. We will also examine a case study to highlight key differences between the two in terms of setup complexity and execution speed.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s get started (unless you want to jump to the conclusions &lt;a href=&#34;./blog/e2b-and-code-interpreter-environments/#tldr&#34;&gt;TLDR;&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&#34;runtimes-for-executing-ai-generated-code&#34;&gt;Runtimes for executing AI-generated code&lt;/h2&gt;
+&lt;p&gt;Dedicated runtimes for executing AI-generated code allow agentic systems to execute code without compromising the security of the host system. Typical features include memory and CPU constraints, file system isolation, and restricted network access.&lt;/p&gt;</description>
+      <content>&lt;p&gt;In this post, we will explore two options for secure execution of AI-generated code: &lt;a href=&#34;https://e2b.dev&#34;&gt;E2B&lt;/a&gt;, a cloud-based platform using microVMs, and &lt;a href=&#34;https://github.com/Jonathan-Adly/AgentRun&#34;&gt;AgentRun&lt;/a&gt;, which combines Docker-based execution with safety mechanisms for lightweight local development. We will also examine a case study to highlight key differences between the two in terms of setup complexity and execution speed.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s get started (unless you want to jump to the conclusions &lt;a href=&#34;./blog/e2b-and-code-interpreter-environments/#tldr&#34;&gt;TLDR;&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&#34;runtimes-for-executing-ai-generated-code&#34;&gt;Runtimes for executing AI-generated code&lt;/h2&gt;
+&lt;p&gt;Dedicated runtimes for executing AI-generated code allow agentic systems to execute code without compromising the security of the host system. Typical features include memory and CPU constraints, file system isolation, and restricted network access.&lt;/p&gt;
+&lt;h3 id=&#34;why-not-just-a-docker-container&#34;&gt;Why not just a Docker container?&lt;/h3&gt;
+&lt;p&gt;Docker containers are a common choice for isolating processes, but they have limitations in the context of executing potentially unsafe code. While Docker does provide isolation, it relies on the underlying host OS kernel, making it vulnerable to kernel-level exploits. Properly configuring Docker to execute code securely can be challenging, and additional safeguards are often necessary. Furthermore, Docker’s performance can be hindered by overhead associated with container management, making lightweight alternatives more appealing for code execution environments.&lt;/p&gt;
+&lt;h2 id=&#34;the-young-promise-in-the-space-e2b&#34;&gt;The young promise in the space: E2B&lt;/h2&gt;
+&lt;p&gt;E2B recently raised a &lt;a href=&#34;https://www.crunchbase.com/funding_round/e2b-1c91-seed--6b20b90e&#34;&gt;$11.5M seed round&lt;/a&gt; for its an open source platform. Unlike traditional container-based approaches, E2B uses &lt;a href=&#34;https://firecracker-microvm.github.io/&#34;&gt;Firecracker&lt;/a&gt; microVMs, which offer a lightweight yet secure execution environment. Their SDK is also packed with built-in features for output post-processing and communication with the cloud-instance.&lt;/p&gt;
+&lt;h3 id=&#34;when-to-use-e2b&#34;&gt;When to Use E2B&lt;/h3&gt;
+&lt;p&gt;E2B is ideal for scenarios where security, speed, and scalability are important. The platform’s use of microVMs ensures strong isolation and fast startup times, making it suitable for high-performance workloads where traditional containers may introduce too much overhead.&lt;/p&gt;
+&lt;p&gt;In theory, E2B is completely open source, as &lt;a href=&#34;https://www.reddit.com/r/LocalLLaMA/comments/1chsx7z/comment/l24qx1t/?utm_source=share&amp;utm_medium=web3x&amp;utm_name=web3xcss&amp;utm_term=1&amp;utm_content=share_button&#34;&gt;mentioned by their CEO&lt;/a&gt;. But setting it up locally is far from trivial and due to limitations on the architecture of the microVMs, it can only be deployed in linux machines 🥲.&lt;/p&gt;
+&lt;h2 id=&#34;alternative-agentrun&#34;&gt;Alternative: AgentRun&lt;/h2&gt;
+&lt;p&gt;For those who prefer not to rely on a cloud-based solution, AgentRun offers a viable local execution alternative. Unlike E2B, which avoids Docker due to security concerns, AgentRun utilizes Docker containers but enhances them with extra safety mechanisms, like using &lt;a href=&#34;https://restrictedpython.readthedocs.io&#34;&gt;RestrictedPython&lt;/a&gt; and &lt;a href=&#34;https://github.com/Jonathan-Adly/AgentRun/blob/29bf2f6f17186e27d5ab2ebd80bddffc7af8a40d/agentrun/__init__.py#L159&#34;&gt;hardcoded constraints&lt;/a&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;when-to-use-agentrun&#34;&gt;When to Use AgentRun&lt;/h3&gt;
+&lt;p&gt;While AgentRun may not offer the same level of advanced features or security guarantees as E2B’s microVM-based approach, it is well-suited for lightweight local development. It is an appealing choice for quickly testing and iterating on code without relying on cloud infrastructure.&lt;/p&gt;
+&lt;p&gt;The setup is very simple: build the docker containers and install the python package. We will see the details in the next&lt;/p&gt;
+&lt;h2 id=&#34;case-study&#34;&gt;Case Study&lt;/h2&gt;
+&lt;p&gt;To compare both frameworks, we will provide a dataset with the columns: &lt;code&gt;[id, name, age, city, salary]&lt;/code&gt; and some dummy entries. We will query the LLM with the question: &lt;em&gt;What is the city with the highest average salary in the provided dataset and what is such salary?&lt;/em&gt;. We will use &lt;a href=&#34;https://ollama.com&#34;&gt;ollama&lt;/a&gt; to query &lt;a href=&#34;https://ollama.com/library/llama3.2&#34;&gt;llama3.2&lt;/a&gt;, since it is one of the models supporting tool use. Let&amp;rsquo;s go&lt;/p&gt;
+&lt;h3 id=&#34;step-1-install-dependencies-and-import-packages&#34;&gt;Step 1: Install dependencies and import packages&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;!&lt;/span&gt;uv pip install e2b&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;code&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;interpreter python&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;dotenv ollama docker agentrun
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; time
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; base64
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; docker
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; os
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; dotenv &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; load_dotenv
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; e2b_code_interpreter &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; Sandbox
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; agentrun &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; AgentRun
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; ollama
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;load_dotenv()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;assert&lt;/span&gt; os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;E2B_API_KEY&amp;#34;&lt;/span&gt;), &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;E2B_API_KEY is not set in the .env file&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;step-2-build-and-run-container-agentrun-only&#34;&gt;Step 2: Build and run container (AgentRun only)&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; contextlib
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; io
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;f &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; io&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;StringIO()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;with&lt;/span&gt; contextlib&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;redirect_stdout(f): &lt;span style=&#34;color:#75715e&#34;&gt;# supress stdout&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;!&lt;/span&gt; docker&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;compose &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;f agentrun_docker&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;docker&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;compose&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;yml up &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;d &lt;span style=&#34;color:#f92672&#34;&gt;--&lt;/span&gt;build 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    load_dotenv(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;./agentrun_docker/.env.dev&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CONTAINER_NAME &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;CONTAINER_NAME&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;step-3-instantiate-runtimes&#34;&gt;Step 3: Instantiate runtimes&lt;/h3&gt;
+&lt;p&gt;For AgentRun, we have to make sure that the container is running&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sbx_e2b &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; Sandbox()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sbx_agentrun &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; AgentRun(container_name&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;CONTAINER_NAME)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;step-4-copy-dataset-to-runtimes&#34;&gt;Step 4: Copy dataset to runtimes&lt;/h3&gt;
+&lt;p&gt;E2B provides a built-in function to do so. For AgentRun, we have to do it manually by copying the dataset to our running container&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;with&lt;/span&gt; open(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;dataset.csv&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;rb&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#66d9ef&#34;&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# For E2B, we can use the built-in function&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    sbx_e2b&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;files&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;write(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/code/dataset.csv&amp;#34;&lt;/span&gt;, f)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# For AgentRun, we have to do it manually by copying &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# the dataset to our running container&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    client &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; docker&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;from_env()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    container &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; client&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;containers&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(CONTAINER_NAME)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    container&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;put_archive(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/code/&amp;#34;&lt;/span&gt;, f&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;read())
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;step-5-set-the-users-prompt&#34;&gt;Step 5: Set the user&amp;rsquo;s prompt&lt;/h3&gt;
+&lt;p&gt;We will ask a question about the data. The first part of the prompt could also be part of the system prompt, but we will put it here for simplicity.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;messages &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; []
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;user_message &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;You are a data scientist and expert Python programmer.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;You will be asked questions about a dataset and will use Python code to analyze the data to answer these questions.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;You have access to a Python environment and can use the run_python_code tool to execute code in this environment.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;The dataset you will work with is provided as a file named &amp;#34;/code/dataset.csv.&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;Use only pandas.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;Question:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;What is the city with the highest average salary in the provided dataset and what is such salary?
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;messages&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;append({
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;role&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;user&amp;#39;&lt;/span&gt;, 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;content&amp;#39;&lt;/span&gt;: user_message
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;})
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;step-6-query-the-model&#34;&gt;Step 6: Query the model&lt;/h3&gt;
+&lt;p&gt;We will use llama 3.2, a 8B model with pretty decent scores in tool use given its size. I can ru it on my laptop 🙃.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;MODEL_NAME &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;llama3.2&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;response &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ollama&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;chat(
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    model&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;MODEL_NAME,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    messages&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;messages,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    tools&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;[{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;type&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;function&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;function&amp;#39;&lt;/span&gt;: {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;name&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;run_python_code&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;description&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Run python code and scripts to answer data science questions&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;parameters&amp;#39;&lt;/span&gt;: {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;          &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;type&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;object&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;          &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;properties&amp;#39;&lt;/span&gt;: {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;code&amp;#39;&lt;/span&gt;: {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;              &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;type&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;string&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;              &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;description&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;The python code to be executed&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            },
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;          },
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;          &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;required&amp;#39;&lt;/span&gt;: [&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;code&amp;#39;&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        },
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      },
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    },
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  ],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  options&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;temperature&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;0.0&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;messages&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;append(response[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;message&amp;#39;&lt;/span&gt;])
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;step-7-define-the-execution-functions&#34;&gt;Step 7: Define the execution functions&lt;/h3&gt;
+&lt;p&gt;We will define a single function &lt;code&gt;run_ai_generated_code&lt;/code&gt; that supports executing the E2B or the AgentRun runtime. Additionally, we defined &lt;code&gt;process_output_e2b&lt;/code&gt; and &lt;code&gt;process_output_agentrun&lt;/code&gt; since both frameworks handle output data differently.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;process_output_e2b&lt;/span&gt;(execution_output):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; execution_output&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;error:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; execution_output&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;error
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    results_idx &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; result &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; execution_output&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;results:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; result&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;png:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#66d9ef&#34;&gt;with&lt;/span&gt; open(&lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;result-&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;results_idx&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;.png&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;wb&amp;#39;&lt;/span&gt;) &lt;span style=&#34;color:#66d9ef&#34;&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                f&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;write(base64&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;b64decode(result&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;png))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                print(&lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Saved result-&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;results_idx&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;.png&amp;#39;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            print(&lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Result &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;results_idx&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;:&amp;#39;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            print(result)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        results_idx &lt;span style=&#34;color:#f92672&#34;&gt;+=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt;  execution_output&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;logs&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;stdout[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;process_output_agentrun&lt;/span&gt;(execution_output):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# AgentRun does not return any fancy output, just the stdout&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; execution_output
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;run_ai_generated_code&lt;/span&gt;(
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                        ai_generated_code: str,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                        sbx_runtime: Sandbox &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; AgentRun,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                        ):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; isinstance(sbx_runtime, Sandbox):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        runner_function &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; sbx_runtime&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;run_code
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;elif&lt;/span&gt; isinstance(sbx_runtime, AgentRun):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        runner_function &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; sbx_runtime&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;execute_code_in_container
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;raise&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ValueError&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Invalid runtime: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;sbx_runtime&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    execution &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; runner_function(ai_generated_code)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    process_output_function &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; process_output_e2b &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; isinstance(sbx_runtime, Sandbox) &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; process_output_agentrun
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; process_output_function(execution)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;step-8-process-the-llms-response&#34;&gt;Step 8: Process the LLM&amp;rsquo;s response&lt;/h3&gt;
+&lt;p&gt;Execute code in the E2B and AgentRun runtimes, according to the tool usage defined by the model output&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;messages_e2b &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; messages&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;copy()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;messages_agentrun &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; messages&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;copy()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; response[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;message&amp;#39;&lt;/span&gt;]&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;tool_calls&amp;#39;&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    available_functions &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;run_python_code&amp;#39;&lt;/span&gt;: run_ai_generated_code,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; tool &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; response[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;message&amp;#39;&lt;/span&gt;][&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;tool_calls&amp;#39;&lt;/span&gt;]:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        arguments &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; tool[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;function&amp;#39;&lt;/span&gt;][&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;arguments&amp;#39;&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        code &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; arguments[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;code&amp;#39;&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        print(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Generated code:&amp;#39;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        print(code)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; runtime_name &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; [&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;e2b&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;agentrun&amp;#34;&lt;/span&gt;]:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            start_time &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; time&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;time()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            print(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;join([&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;=&amp;#39;&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            print(&lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Executing code in the &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;runtime_name&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; sandbox....&amp;#39;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            runtime &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; sbx_e2b &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; runtime_name &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;e2b&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; sbx_agentrun
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            function_to_call &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; available_functions[tool[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;function&amp;#39;&lt;/span&gt;][&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;name&amp;#39;&lt;/span&gt;]]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            function_response &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; function_to_call(code, runtime)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            print(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Code execution finished!&amp;#39;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            print(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Response from the function:&amp;#39;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            print(function_response)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            end_time &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; time&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;time()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            print(&lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Elapsed time: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;end_time &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; start_time&lt;span style=&#34;color:#e6db74&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;.2f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; seconds&amp;#39;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; runtime_name &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;e2b&amp;#34;&lt;/span&gt;:       
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                messages_e2b&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;append({
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;role&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;tool&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;content&amp;#39;&lt;/span&gt;: function_response
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                })
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#66d9ef&#34;&gt;elif&lt;/span&gt; runtime_name &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;agentrun&amp;#34;&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                messages_agentrun&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;append({
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;role&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;tool&amp;#39;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;content&amp;#39;&lt;/span&gt;: function_response
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                })
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                &lt;span style=&#34;color:#66d9ef&#34;&gt;raise&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ValueError&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Invalid runtime name: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;runtime_name&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;the-output&#34;&gt;The output:&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;    Generated code:
+    import pandas as pd
+    import numpy as np
+    # Load the dataset
+    df = pd.read_csv(&amp;#34;/code/dataset.csv&amp;#34;)
+    # Group by city and calculate average salary
+    avg_salary_by_city = df.groupby(&amp;#34;city&amp;#34;)[&amp;#39;salary&amp;#39;].mean()
+    # Get the city with the highest average salary and its value
+    highest_avg_salary_city = avg_salary_by_city.idxmax()
+    highest_avg_salary = avg_salary_by_city.max()
+    print(f&amp;#34;The city with the highest average salary is {highest_avg_salary_city} with an average salary of {highest_avg_salary}&amp;#34;)
+    =====================================================================================
+    Executing code in the e2b sandbox....
+    Code execution finished!
+    Response from the function:
+    The city with the highest average salary is Seattle with an average salary of 73500.0
+    
+    Elapsed time: 0.34 seconds
+    =====================================================================================
+    Executing code in the agentrun sandbox....
+    Code execution finished!
+    Response from the function:
+    The city with the highest average salary is Seattle with an average salary of 73500.0
+    
+    Elapsed time: 1.90 seconds
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;I was expecting a difference in the execution times, but it is impressive that E2B manages to be x6 faster than using a local container on a decent laptop.&lt;/p&gt;
+&lt;h2 id=&#34;tldr&#34;&gt;TLDR;&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://e2b.dev/&#34;&gt;E2B&lt;/a&gt; is a solid option for blazing fast and secure code execution in the cloud. While support for local development is still evolving, it comes packed with many built-in features, and comprehensive documentation.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/Jonathan-Adly/AgentRun&#34;&gt;AgentRun&lt;/a&gt; is lightweight and super easy to setup.  Ot lacks some advanced features found in E2B, but it is lightweight by nature and pretty stable, an ideal choice for developers who prefer a simpler, self-hosted solution.&lt;/p&gt;
+&lt;p&gt;You can find the code for a side-to-side comparison here: &lt;a href=&#34;https://github.com/jscastanoc/ai-code-runtime&#34;&gt;https://github.com/jscastanoc/ai-code-runtime&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;sources&#34;&gt;Sources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://e2b.dev/&#34;&gt;https://e2b.dev/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/Jonathan-Adly/AgentRun&#34;&gt;https://github.com/Jonathan-Adly/AgentRun&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=XmExYTHmvbw&#34;&gt;Video: E2B: The Missing Piece for AI Agents?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.reddit.com/r/LocalLLaMA/comments/1chsx7z/is_there_an_opensource_alternative_to_e2b_e2bdev/&#34;&gt;Reddit: is there an open source alternative to e2b?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+    </item>
+    
     <item>
       <title></title>
-      <link>https://jscastanoc.github.io/blog/blog/</link>
+      <link>http://localhost:1313/blog/blog/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://jscastanoc.github.io/blog/blog/</guid>
+      <guid>http://localhost:1313/blog/blog/</guid>
       <description></description>
       <content></content>
     </item>
     
     <item>
       <title></title>
-      <link>https://jscastanoc.github.io/content/</link>
+      <link>http://localhost:1313/content/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://jscastanoc.github.io/content/</guid>
+      <guid>http://localhost:1313/content/</guid>
       <description></description>
       <content></content>
     </item>
     
     <item>
       <title>about</title>
-      <link>https://jscastanoc.github.io/about/</link>
+      <link>http://localhost:1313/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://jscastanoc.github.io/about/</guid>
+      <guid>http://localhost:1313/about/</guid>
       <description>&lt;style&gt;
   .columns {
     display: flex;
@@ -88,7 +319,7 @@
       &lt;h1 id=&#34;who-am-i&#34;&gt;Who am I?&lt;/h1&gt;
 &lt;p&gt;I’m Sebastian, a freelance data scientist, AI/ML expert, and tech lead. I have a PhD in machine learning and neuroscience from the University of Freiburg (Germany), and a background in electronics engineering.&lt;/p&gt;&lt;/div&gt;
     &lt;div class=&#34;column&#34;&gt;
-      &lt;img src=&#34;./me.jpeg&#34;  alt=&#34;Hello Friend&#34;  class=&#34;center&#34;  style=&#34;border-radius: 8px;width: 200px&#34;    /&gt;
+      &lt;img src=&#34;./resized-me.jpeg&#34;  alt=&#34;Hello Friend&#34;  class=&#34;center&#34;  style=&#34;border-radius: 8px;width: 200px&#34;    /&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;h1 id=&#34;what-experience-do-i-bring&#34;&gt;What experience do I bring?&lt;/h1&gt;
