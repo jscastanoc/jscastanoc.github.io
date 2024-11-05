@@ -1,7 +1,8 @@
 :root {
-  --background: #1a170f;
-  --foreground: #f6f7ee;
-  --accent: #d0e71c;
+  --background: #161614;
+  --foreground: #b8b8b2;
+  --accent: #cadb49;
+  --accent-dark: #308aa5;
   --font-size: 1rem;
   --line-height: 1.54rem;
   --radius: 0px;
@@ -253,7 +254,7 @@ kbd {
     monospace !important;
   font-feature-settings: normal;
   background: color-mix(in srgb, var(--foreground) 5%, transparent);
-  color: var(--accent);
+  color: var(--accent-dark);
   padding: 1px 6px;
   margin: 0 2px;
   font-size: 0.95rem;
@@ -299,7 +300,7 @@ sup {
 abbr {
   position: relative;
   text-decoration-style: wavy;
-  text-decoration-color: var(--accent);
+  text-decoration-color: var(--accent-dark);
   cursor: help;
 }
 
@@ -329,7 +330,7 @@ blockquote:before {
   display: block;
   position: absolute;
   left: 0;
-  color: var(--accent);
+  color: var(--accent-dark);
 }
 
 blockquote p:first-child {

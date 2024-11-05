@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+    <title>Foundation Models for Time Series—A Case Study Using Brain Signals :: Dr. Sebastian Castano</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="For this post, I wanted to take a look at general purpose time series foundation models. In particular, I am curious about what the “general” part of these models actually entails. It is not intended as a throughout benchmark, but more as an exploratory exercise.
+I will start with a short intro about why foundation models for time series are in a different category compared to language or vision models, with an overview on what has been released the last year or so.
+" />
+<meta name="keywords" content="" />
+
+  <meta name="robots" content="noodp" />
+
+<link rel="canonical" href="https://jscastanoc.github.io/blog/foundation-models-for-time-series/" />
+
+
+
+
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/buttons.min.2bc533403a27dfe0e93105a92502b42ce4587e2e4a87d9f7d349e51e16e09478.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/code.min.00125962708925857e7b66dbc58391d55be1191a3d0ce2034de8c9cd2c481c36.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/fonts.min.4881f0c525f3ce2a1864fb6e96676396cebe1e6fcef1933e8e1dde7041004fb5.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/footer.min.2e3eb191baee58dd05a9f0104ac1fab0827bca7c64dafe0b2579f934c33a1d69.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/gist.min.a751e8b0abe1ba8bc53ced52a38b19d8950fe78ca29454ea8c2595cf26aad5c0.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/header.min.b6fb4423cf82a9f9d7abc9cd010223fa3d70a6526a3f28f8e17d814c06e18f9e.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/main.min.fe8dc560fccb53a458b0db19ccb7b265764ac46b68596b7e099c6793054dd457.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/menu.min.83637a90d903026bc280d3f82f96ceb06c5fc72b7c1a8d686afb5bbf818a29f7.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/pagination.min.82f6400eae7c7c6dc3c866733c2ec0579e4089608fea69400ff85b3880aa0d3c.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/post.min.fc74ca360273c1d828da3c02b8174eba435607b369d98418ccc6f2243cd4e75d.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/prism.min.9023bbc24533d09e97a51a0a42a5a7bfe4c591ae167c5551fb1d2191d11977c0.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/syntax.min.cc789ed9377260d7949ea4c18781fc58959a89287210fe4edbff44ebfc1511b6.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/terminal.min.29422bac90082128dbc87421bb91cf7b76f4e417f16aacba8a7fc1d4e8e4e2f1.css">
+
+  
+  <link rel="stylesheet" href="https://jscastanoc.github.io/css/terms.min.b81791663c3790e738e571cdbf802312390d30e4b1d8dc9d814a5b5454d0ac11.css">
+
+
+<link rel="stylesheet" href="https://jscastanoc.github.io/terminal.css">
+
+
+
+
+<link rel="shortcut icon" href="https://jscastanoc.github.io/favicon.png">
+<link rel="apple-touch-icon" href="https://jscastanoc.github.io/apple-touch-icon.png">
+
+
+<meta name="twitter:card" content="summary" />
+
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Foundation Models for Time Series—A Case Study Using Brain Signals">
+<meta property="og:description" content="For this post, I wanted to take a look at general purpose time series foundation models. In particular, I am curious about what the “general” part of these models actually entails. It is not intended as a throughout benchmark, but more as an exploratory exercise.
+I will start with a short intro about why foundation models for time series are in a different category compared to language or vision models, with an overview on what has been released the last year or so.
+" />
+<meta property="og:url" content="https://jscastanoc.github.io/blog/foundation-models-for-time-series/" />
+<meta property="og:site_name" content="Dr. Sebastian Castano" />
+
+  <meta property="og:image" content="https://jscastanoc.github.io/og-image.png">
+
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+
+
+  <meta property="article:published_time" content="2024-11-05 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+
+
+<div class="container center">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="../../">
+  <div class="logo">
+    Dr. Sebastian Castano
+  </div>
+</a>
+
+    </div>
+    
+      <ul class="menu menu--mobile">
+  <li class="menu__trigger">Menu&nbsp;▾</li>
+  <li>
+    <ul class="menu__dropdown">
+      
+        
+          <li><a href="../../">1-Home</a></li>
+        
+      
+        
+          <li><a href="../../blog">2-Blog</a></li>
+        
+      
+        
+          <li><a href="../../pubs">3-Publications</a></li>
+        
+      
+        
+          <li><a href="../../about">4-About</a></li>
+        
+      
+      
+    </ul>
+  </li>
+</ul>
+
+    
+    
+  </div>
+  
+    <nav class="navigation-menu">
+  <ul class="navigation-menu__inner menu--desktop">
+    
+      
+        
+          <li><a href="../../" >1-Home</a></li>
+        
+      
+        
+          <li><a href="../../blog" >2-Blog</a></li>
+        
+      
+        
+          <li><a href="../../pubs" >3-Publications</a></li>
+        
+      
+        
+          <li><a href="../../about" >4-About</a></li>
+        
+      
+      
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+<article class="post">
+  <h1 class="post-title">
+    <a href="https://jscastanoc.github.io/blog/foundation-models-for-time-series/">Foundation Models for Time Series—A Case Study Using Brain Signals</a>
+  </h1>
+  <div class="post-meta"><time class="post-date">2024-11-05</time></div>
+
+  
+  
+
+
+  
+
+  <div class="post-content"><div>
+        <p>For this post, I wanted to take a look at general purpose time series foundation models. In particular, I am curious about what the “general” part of these models actually entails. It is not intended as a throughout benchmark, but more as an exploratory exercise.</p>
+<p>I will start with a short intro about why foundation models for time series are in a different category compared to language or vision models, with an overview on what has been released the last year or so.</p>
+<p>Then, I will transition to a case study with one of these models—<a href="https://github.com/moment-timeseries-foundation-model/moment-research"><strong>MOMENT</strong></a>—by analyzing <a href="https://en.wikipedia.org/wiki/Electroencephalography">Electroencephalographic</a> (EEG) data from a brain-computer interface experiment. Why EEG data? well, earlier this year, <a href="https://piramidal.ai/">Piramidal</a>—a YC-backed company building a foundational model <em>specifically</em> for EEG data—raised a $6.5M seed round. That left me wondering how good general-purpose models can be if companies are raising rounds this size for training domain-specific models.</p>
+<p>Impatient? <a href="../../blog/foundation-models-for-time-series/#tldr">TLDR;</a></p>
+<h2 id="why-are-general-time-series-foundation-models-different-from-other-modalities">Why are general time series foundation models different from other modalities?<a href="#why-are-general-time-series-foundation-models-different-from-other-modalities" class="hanchor" ariaLabel="Anchor">#</a> </h2>
+<p>Language and vision have fundamental structures that are largely consistent, regardless of the domain. With language, for example, models trained on a math textbook and Shakespearean prose will still capture structural rules—syntax, grammar, sentence formation—. Domain-specific vocabulary or context can vary, but the foundational structure of language doesn’t change. Similarly, vision models can learn shapes, edges, colors, spatial patterns and textures that carry semantic meaning.</p>
+<p>However, when it comes to time series, I initially had some questions about the potential for such broad generalizability. Time series data holds information far beyond trends and seasonality: complex dynamics like phase and frequency modulation, as well as phase-amplitude coupling, can govern many processes and can drastically vary from one domain to the other. And this doesn’t even account for multi-channel data, where cross-channel interactions add yet another layer of complexity.</p>
+<h2 id="overview-of-time-series-foundation-models">Overview of Time Series Foundation Models<a href="#overview-of-time-series-foundation-models" class="hanchor" ariaLabel="Anchor">#</a> </h2>
+<p>Here’s an overview of some pre-trained models for time series, along with the companies or labs behind them:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Model Link</th>
+          <th>Company / University</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><a href="https://github.com/google-research/timesfm"><strong>TimesFM</strong></a></td>
+          <td>Google</td>
+      </tr>
+      <tr>
+          <td><a href="https://github.com/time-series-foundation-models/lag-llama"><strong>Lag-Llama</strong></a></td>
+          <td>-</td>
+      </tr>
+      <tr>
+          <td><a href="https://github.com/abacusai/ForecastPFN?tab=readme-ov-file#inference-with-pretrained-model-"><strong>ForecastPFN</strong></a></td>
+          <td>Abacus.ai</td>
+      </tr>
+      <tr>
+          <td><a href="https://github.com/ibm-granite/granite-tsfm/tree/main/tsfm_public/models/tinytimemixer"><strong>TinyTimeMixer</strong></a></td>
+          <td>IBM</td>
+      </tr>
+      <tr>
+          <td><a href="https://github.com/SalesforceAIResearch/uni2ts"><strong>Uni2TS</strong></a></td>
+          <td>Salesforce</td>
+      </tr>
+      <tr>
+          <td><a href="https://github.com/moment-timeseries-foundation-model/moment-research"><strong>Moment</strong></a></td>
+          <td>CMU</td>
+      </tr>
+      <tr>
+          <td><a href="https://blog.salesforceairesearch.com/moirai/"><strong>MOIRAI</strong></a></td>
+          <td>Salesforce</td>
+      </tr>
+      <tr>
+          <td><a href="https://www.datadoghq.com/blog/datadog-time-series-foundation-model/"><strong>Toto</strong></a></td>
+          <td>Datadog</td>
+      </tr>
+      <tr>
+          <td><a href="https://github.com/amazon-research/amazon-chronos"><strong>Chronos</strong></a></td>
+          <td>Amazon</td>
+      </tr>
+      <tr>
+          <td><a href="https://docs.nixtla.io/">TimeGPT</a></td>
+          <td>NIXTLA</td>
+      </tr>
+  </tbody>
+</table>
+<p>Many of these models are pre-trained on data from diverse domains—weather, medicine (e.g., ECGs), finance, and more. The pre-training approach for most of these models is similar to that used in vision models: masks are applied at various time points, and the model learns to predict the values for these masked intervals, effectively filling in the gaps.</p>
+<p>Ideally, pre-training enables these models to identify and understand informative patterns inherent across domains. Beyond basic seasonality and trends, a robust foundation model should capture higher-level structures such as phase and frequency modulations and cross-channel interactions. This level of adaptability would make such models truly general-purpose, equipping them to handle the intricate dynamics present in complex time series data. However, given the vast range of domains and the diversity of signal types, achieving this level of adaptability seems very challenging. The differences in underlying structures across domains makes it difficult for any single model to effectively capture the full complexity of <em>any type of</em> time series data, which would explain the emergence domain-specific foundation models such as the one the developed by Piramidal.</p>
+<h2 id="case-study">Case study<a href="#case-study" class="hanchor" ariaLabel="Anchor">#</a> </h2>
+<p>As exploration exercise , I chose <a href="https://github.com/moment-timeseries-foundation-model/moment-research"><strong>MOMENT</strong></a>. Reported results look very good. Besides that, it is very well documented. For the data, I chose an EEG dataset corresponding to a standard classification task for a brain-computer interface. More on the data below.</p>
+<p>The goal is to assess the zero-shot performance of the MOMENT embeddings, as used in an LDA classifier downstream. The code below can also be found <a href="https://github.com/jscastanoc/castano-blog-notebooks/blob/main/fmodel-ts-classification/moment-bci.ipynb">here</a></p>
+<h3 id="step-set-up-general-parameters">Step: Set up general parameters<a href="#step-set-up-general-parameters" class="hanchor" ariaLabel="Anchor">#</a> </h3>
+<p>We&rsquo;ll be using the small version of the model and a subset of the EEG channels to simplify the analysis.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>uv pip install numpy pandas scikit<span style="color:#f92672">-</span>learn matplotlib tqdm torch moabb pyriemann
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>uv pip install git<span style="color:#f92672">+</span>https:<span style="color:#f92672">//</span>github<span style="color:#f92672">.</span>com<span style="color:#f92672">/</span>moment<span style="color:#f92672">-</span>timeseries<span style="color:#f92672">-</span>foundation<span style="color:#f92672">-</span>model<span style="color:#f92672">/</span>moment<span style="color:#f92672">.</span>git
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TORCH_DEVICE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;mps&#39;</span> <span style="color:#75715e"># Apple Silicon GPU</span>
+</span></span><span style="display:flex;"><span>MODEL_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;AutonLab/MOMENT-1-small&#39;</span>
+</span></span><span style="display:flex;"><span>EEG_CHANNELS <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;Fz&#39;</span>, <span style="color:#e6db74">&#39;C3&#39;</span>, <span style="color:#e6db74">&#39;Cz&#39;</span>, <span style="color:#e6db74">&#39;C4&#39;</span>, <span style="color:#e6db74">&#39;P3&#39;</span>, <span style="color:#e6db74">&#39;Pz&#39;</span>, <span style="color:#e6db74">&#39;P4&#39;</span>, <span style="color:#e6db74">&#39;O1&#39;</span>, <span style="color:#e6db74">&#39;O2&#39;</span>] 
+</span></span><span style="display:flex;"><span>SAMPLING_FREQUENCY <span style="color:#f92672">=</span> <span style="color:#ae81ff">512</span>
+</span></span></code></pre></div><h3 id="step-load-the-data">Step: Load the data<a href="#step-load-the-data" class="hanchor" ariaLabel="Anchor">#</a> </h3>
+<p>We will use one of the sessions of the ERP study published by <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0175856">Hübner et al. 2017</a> and available via de Mother Of All BCI Benchmarks <a href="http://moabb.neurotechx.com/docs/index.html">MOABB</a>. The experiment in a nutshell: The patients are presented a rapid sequence of different visual stimuli, some of which they are instructed to pay attention to—target stimuli—and some of which they have to ignore—non-target stimuli—. It is expected that the brain response to each class is different.</p>
+<p>The dataset contains data for 13 subjects participating in 3 sessions each. It is not the scope of this post to do a throughout benchmark, so we will limit the dataset to one of the sessions of one of the subjects.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> contextlib
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> io
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> warnings
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.preprocessing <span style="color:#f92672">import</span> LabelEncoder
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> moabb <span style="color:#f92672">import</span> datasets
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> moabb.paradigms <span style="color:#f92672">import</span> P300
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>Huebner2017(interval<span style="color:#f92672">=</span>[<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">.99</span>])
+</span></span><span style="display:flex;"><span>dataset<span style="color:#f92672">.</span>download()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>paradigm <span style="color:#f92672">=</span> P300(    
+</span></span><span style="display:flex;"><span>    resample<span style="color:#f92672">=</span>SAMPLING_FREQUENCY,
+</span></span><span style="display:flex;"><span>    baseline<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>,
+</span></span><span style="display:flex;"><span>    channels<span style="color:#f92672">=</span>EEG_CHANNELS
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>stdout <span style="color:#f92672">=</span> io<span style="color:#f92672">.</span>StringIO()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> contextlib<span style="color:#f92672">.</span>redirect_stdout(stdout), warnings<span style="color:#f92672">.</span>catch_warnings(record<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>) <span style="color:#66d9ef">as</span> w:
+</span></span><span style="display:flex;"><span>    X, y, metadata <span style="color:#f92672">=</span> paradigm<span style="color:#f92672">.</span>get_data(
+</span></span><span style="display:flex;"><span>        dataset<span style="color:#f92672">=</span>dataset,
+</span></span><span style="display:flex;"><span>        subjects<span style="color:#f92672">=</span>[<span style="color:#ae81ff">1</span>],
+</span></span><span style="display:flex;"><span>        return_epochs<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>        return_raws<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>        cache_config<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>,
+</span></span><span style="display:flex;"><span>        postprocess_pipeline<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Limit to one session</span>
+</span></span><span style="display:flex;"><span>session <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>
+</span></span><span style="display:flex;"><span>ids_mask_session <span style="color:#f92672">=</span> metadata<span style="color:#f92672">.</span>session <span style="color:#f92672">==</span> session
+</span></span><span style="display:flex;"><span>y_encoded <span style="color:#f92672">=</span> LabelEncoder()<span style="color:#f92672">.</span>fit_transform(y)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> X[ids_mask_session]
+</span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> y_encoded[ids_mask_session]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Print number of classes and number of samples per class</span>
+</span></span><span style="display:flex;"><span>unique_classes, counts <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>unique(y, return_counts<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Number of classes: </span><span style="color:#e6db74">{</span>len(unique_classes)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> cls, count <span style="color:#f92672">in</span> zip(unique_classes, counts):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Class &#39;</span><span style="color:#e6db74">{</span>cls<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;: </span><span style="color:#e6db74">{</span>count<span style="color:#e6db74">}</span><span style="color:#e6db74"> samples&#34;</span>)
+</span></span></code></pre></div><pre><code>Number of classes: 2
+Class '0': 3275 samples
+Class '1': 1008 samples
+</code></pre>
+<h3 id="step-explore-the-data">Step: Explore the data<a href="#step-explore-the-data" class="hanchor" ariaLabel="Anchor">#</a> </h3>
+<p>Let&rsquo;s take a look at what the average brain activity is for each target and non target stimuli, for each of the channels. I have highlighted two periods, where we find archetypical responses for this type of stimuli, the so-called N100 and P300: a (N)egative spike around 100ms after stimuli, and a (P)ositive spike around 300ms after stimuli. N100 is to be seen predominantly in electrodes around the visual cortex, i.e., Occital Channels O1 and O2, where as P300 is commonly seen in Central-Parietal, closer to the top of the skull, i.e., Cz and Pz.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> plotly.express <span style="color:#66d9ef">as</span> px
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#66d9ef">as</span> plt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> plotly.graph_objects <span style="color:#66d9ef">as</span> go
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> plotly.subplots <span style="color:#f92672">import</span> make_subplots
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ids_target <span style="color:#f92672">=</span> y <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>X_target <span style="color:#f92672">=</span> X[ids_target]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ids_nontarget <span style="color:#f92672">=</span> y <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>X_nontarget <span style="color:#f92672">=</span> X[ids_nontarget]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_target_avg <span style="color:#f92672">=</span> X_target<span style="color:#f92672">.</span>mean(axis<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>X_nontarget_avg <span style="color:#f92672">=</span> X_nontarget<span style="color:#f92672">.</span>mean(axis<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>num_channels <span style="color:#f92672">=</span> X_target_avg<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a figure with subplots in a square grid</span>
+</span></span><span style="display:flex;"><span>num_cols <span style="color:#f92672">=</span> int(np<span style="color:#f92672">.</span>ceil(np<span style="color:#f92672">.</span>sqrt(num_channels)))
+</span></span><span style="display:flex;"><span>num_rows <span style="color:#f92672">=</span> int(np<span style="color:#f92672">.</span>ceil(num_channels <span style="color:#f92672">/</span> num_cols))
+</span></span><span style="display:flex;"><span>fig <span style="color:#f92672">=</span> make_subplots(rows<span style="color:#f92672">=</span>num_rows, cols<span style="color:#f92672">=</span>num_cols, subplot_titles<span style="color:#f92672">=</span>EEG_CHANNELS, shared_xaxes<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, shared_yaxes<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, vertical_spacing<span style="color:#f92672">=</span><span style="color:#ae81ff">0.05</span>, horizontal_spacing<span style="color:#f92672">=</span><span style="color:#ae81ff">0.02</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>time_vector: np<span style="color:#f92672">.</span>ndarray <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>arange(X_target_avg<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">1</span>])<span style="color:#f92672">/</span>SAMPLING_FREQUENCY
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Plot each channel in a separate subplot</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(num_channels):
+</span></span><span style="display:flex;"><span>    row: int <span style="color:#f92672">=</span> i <span style="color:#f92672">//</span> num_cols <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    col: int <span style="color:#f92672">=</span> i <span style="color:#f92672">%</span> num_cols <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    showlegend: bool <span style="color:#f92672">=</span> (i <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    fig<span style="color:#f92672">.</span>add_trace(
+</span></span><span style="display:flex;"><span>        go<span style="color:#f92672">.</span>Scatter(
+</span></span><span style="display:flex;"><span>            x<span style="color:#f92672">=</span>time_vector, 
+</span></span><span style="display:flex;"><span>            y<span style="color:#f92672">=</span>X_target_avg[i], 
+</span></span><span style="display:flex;"><span>            mode<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lines&#39;</span>, 
+</span></span><span style="display:flex;"><span>            name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Target&#39;</span> <span style="color:#66d9ef">if</span> showlegend <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">None</span>, 
+</span></span><span style="display:flex;"><span>            line<span style="color:#f92672">=</span>dict(color<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;red&#39;</span>),
+</span></span><span style="display:flex;"><span>            showlegend<span style="color:#f92672">=</span>showlegend
+</span></span><span style="display:flex;"><span>        ), 
+</span></span><span style="display:flex;"><span>        row<span style="color:#f92672">=</span>row, col<span style="color:#f92672">=</span>col
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    fig<span style="color:#f92672">.</span>add_trace(
+</span></span><span style="display:flex;"><span>        go<span style="color:#f92672">.</span>Scatter(
+</span></span><span style="display:flex;"><span>            x<span style="color:#f92672">=</span>time_vector, 
+</span></span><span style="display:flex;"><span>            y<span style="color:#f92672">=</span>X_nontarget_avg[i], 
+</span></span><span style="display:flex;"><span>            mode<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lines&#39;</span>, 
+</span></span><span style="display:flex;"><span>            name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;NonTarget&#39;</span> <span style="color:#66d9ef">if</span> showlegend <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">None</span>, 
+</span></span><span style="display:flex;"><span>            line<span style="color:#f92672">=</span>dict(color<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;blue&#39;</span>),
+</span></span><span style="display:flex;"><span>            showlegend<span style="color:#f92672">=</span>showlegend
+</span></span><span style="display:flex;"><span>        ), 
+</span></span><span style="display:flex;"><span>        row<span style="color:#f92672">=</span>row, col<span style="color:#f92672">=</span>col
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    fig<span style="color:#f92672">.</span>add_vrect(
+</span></span><span style="display:flex;"><span>        x0<span style="color:#f92672">=</span><span style="color:#ae81ff">60</span><span style="color:#f92672">/</span>SAMPLING_FREQUENCY, x1<span style="color:#f92672">=</span><span style="color:#ae81ff">80</span><span style="color:#f92672">/</span>SAMPLING_FREQUENCY, 
+</span></span><span style="display:flex;"><span>        fillcolor<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;#EFCB66&#34;</span>, opacity<span style="color:#f92672">=</span><span style="color:#ae81ff">0.5</span>, 
+</span></span><span style="display:flex;"><span>        layer<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;below&#34;</span>, line_width<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>        row<span style="color:#f92672">=</span>row, col<span style="color:#f92672">=</span>col
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    fig<span style="color:#f92672">.</span>add_vrect(
+</span></span><span style="display:flex;"><span>        x0<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span><span style="color:#f92672">/</span>SAMPLING_FREQUENCY, x1<span style="color:#f92672">=</span><span style="color:#ae81ff">256</span><span style="color:#f92672">/</span>SAMPLING_FREQUENCY, 
+</span></span><span style="display:flex;"><span>        fillcolor<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;#90EE90&#34;</span>, opacity<span style="color:#f92672">=</span><span style="color:#ae81ff">0.5</span>, 
+</span></span><span style="display:flex;"><span>        layer<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;below&#34;</span>, line_width<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>        row<span style="color:#f92672">=</span>row, col<span style="color:#f92672">=</span>col
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> row <span style="color:#f92672">==</span> num_rows:
+</span></span><span style="display:flex;"><span>        fig<span style="color:#f92672">.</span>update_xaxes(title_text<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;seconds after stimulus&#34;</span>, row<span style="color:#f92672">=</span>row, col<span style="color:#f92672">=</span>col)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> col <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>        fig<span style="color:#f92672">.</span>update_yaxes(title_text<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;µV&#34;</span>, row<span style="color:#f92672">=</span>row, col<span style="color:#f92672">=</span>col)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Update layout</span>
+</span></span><span style="display:flex;"><span>y_axis_range: list[float] <span style="color:#f92672">=</span> [min(X_nontarget_avg<span style="color:#f92672">.</span>min(), X_target_avg<span style="color:#f92672">.</span>min()), max(X_nontarget_avg<span style="color:#f92672">.</span>max(), X_target_avg<span style="color:#f92672">.</span>max())]
+</span></span><span style="display:flex;"><span>fig<span style="color:#f92672">.</span>update_layout(
+</span></span><span style="display:flex;"><span>    height<span style="color:#f92672">=</span><span style="color:#ae81ff">800</span>, 
+</span></span><span style="display:flex;"><span>    width<span style="color:#f92672">=</span><span style="color:#ae81ff">1000</span>, 
+</span></span><span style="display:flex;"><span>    showlegend<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> row <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, num_rows <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>    fig<span style="color:#f92672">.</span>update_yaxes(range<span style="color:#f92672">=</span>y_axis_range, row<span style="color:#f92672">=</span>row, col<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>fig<span style="color:#f92672">.</span>show()
+</span></span></code></pre></div><h3 id="step-baseline-pipeline">Step: Baseline pipeline<a href="#step-baseline-pipeline" class="hanchor" ariaLabel="Anchor">#</a> </h3>
+<p>As baseline, we will implemented a pipeline that is commonly used with this type of data. It consist of a <em>spatial filter</em>, which means, a linear mix across all channels. The spatial filters are learned from data, such that the difference between classes is maximized. This is the <a href="https://ieeexplore.ieee.org/abstract/document/4760273">XDawn</a> part of the pipeline.</p>
+<p>The spatial filters are followed by a standard LDA classifier.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.metrics <span style="color:#f92672">import</span> get_scorer
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pyriemann.estimation <span style="color:#f92672">import</span> Xdawn
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.discriminant_analysis <span style="color:#f92672">import</span> LinearDiscriminantAnalysis <span style="color:#66d9ef">as</span> LDA
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.pipeline <span style="color:#f92672">import</span> make_pipeline
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> train_test_split
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> mne.decoding <span style="color:#f92672">import</span> Vectorizer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_train, X_test, y_train, y_test <span style="color:#f92672">=</span> train_test_split(X, y, test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.3</span>, random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">42</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>baseline_pipeline <span style="color:#f92672">=</span> make_pipeline(
+</span></span><span style="display:flex;"><span>    Xdawn(nfilter<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>), 
+</span></span><span style="display:flex;"><span>    Vectorizer(),
+</span></span><span style="display:flex;"><span>    LDA(
+</span></span><span style="display:flex;"><span>        solver<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lsqr&#39;</span>, 
+</span></span><span style="display:flex;"><span>        shrinkage<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;auto&#39;</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Fit the baseline pipeline</span>
+</span></span><span style="display:flex;"><span>baseline_pipeline<span style="color:#f92672">.</span>fit(X_train, y_train)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Predict on the test set</span>
+</span></span><span style="display:flex;"><span>y_pred <span style="color:#f92672">=</span> baseline_pipeline<span style="color:#f92672">.</span>predict(X_test)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Calculate the test score</span>
+</span></span><span style="display:flex;"><span>test_score: float <span style="color:#f92672">=</span> get_scorer(paradigm<span style="color:#f92672">.</span>scoring)(baseline_pipeline, X_test, y_test)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Test ROC-AUC XDAWN+LDA: </span><span style="color:#e6db74">{</span>test_score<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Test ROC-AUC XDAWN+LDA: 0.9788115284974094
+</code></pre>
+<p>pas mal.</p>
+<h3 id="step-data-preparation-for-the-moment-torch-mdoel">Step: Data preparation for the MOMENT torch mdoel<a href="#step-data-preparation-for-the-moment-torch-mdoel" class="hanchor" ariaLabel="Anchor">#</a> </h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>N_INPUT_SAMPLES <span style="color:#f92672">=</span> <span style="color:#ae81ff">512</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.preprocessing <span style="color:#f92672">import</span> LabelEncoder
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch.utils.data <span style="color:#f92672">import</span> TensorDataset, DataLoader
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> train_test_split
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">prepare_data</span>(X_train, X_test, y_train, y_test):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Convert to torch tensors</span>
+</span></span><span style="display:flex;"><span>    X_train_tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>tensor(X_train, dtype<span style="color:#f92672">=</span>torch<span style="color:#f92672">.</span>float32)
+</span></span><span style="display:flex;"><span>    X_test_tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>tensor(X_test, dtype<span style="color:#f92672">=</span>torch<span style="color:#f92672">.</span>float32)
+</span></span><span style="display:flex;"><span>    y_train_tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>tensor(y_train, dtype<span style="color:#f92672">=</span>torch<span style="color:#f92672">.</span>long)
+</span></span><span style="display:flex;"><span>    y_test_tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>tensor(y_test, dtype<span style="color:#f92672">=</span>torch<span style="color:#f92672">.</span>long)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># pad the input to 512</span>
+</span></span><span style="display:flex;"><span>    X_train_tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>nn<span style="color:#f92672">.</span>functional<span style="color:#f92672">.</span>pad(X_train_tensor, (<span style="color:#ae81ff">0</span>, N_INPUT_SAMPLES <span style="color:#f92672">-</span> X_train_tensor<span style="color:#f92672">.</span>shape[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]))
+</span></span><span style="display:flex;"><span>    X_test_tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>nn<span style="color:#f92672">.</span>functional<span style="color:#f92672">.</span>pad(X_test_tensor, (<span style="color:#ae81ff">0</span>, N_INPUT_SAMPLES <span style="color:#f92672">-</span> X_test_tensor<span style="color:#f92672">.</span>shape[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    input_mask: torch<span style="color:#f92672">.</span>Tensor <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>cat([torch<span style="color:#f92672">.</span>ones(X_train<span style="color:#f92672">.</span>shape[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>], dtype<span style="color:#f92672">=</span>torch<span style="color:#f92672">.</span>bool), torch<span style="color:#f92672">.</span>zeros(N_INPUT_SAMPLES <span style="color:#f92672">-</span> X_train<span style="color:#f92672">.</span>shape[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>], dtype<span style="color:#f92672">=</span>torch<span style="color:#f92672">.</span>bool)])
+</span></span><span style="display:flex;"><span>    input_mask <span style="color:#f92672">=</span> input_mask<span style="color:#f92672">.</span>unsqueeze(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">.</span>repeat(X_train_tensor<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>], <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Create TensorDataset</span>
+</span></span><span style="display:flex;"><span>    train_dataset <span style="color:#f92672">=</span> TensorDataset(X_train_tensor, y_train_tensor, input_mask[:X_train_tensor<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]])
+</span></span><span style="display:flex;"><span>    test_dataset <span style="color:#f92672">=</span> TensorDataset(X_test_tensor, y_test_tensor, input_mask[:X_test_tensor<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Create DataLoader</span>
+</span></span><span style="display:flex;"><span>    train_dataloader <span style="color:#f92672">=</span> DataLoader(train_dataset, batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">32</span>, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>    test_dataloader <span style="color:#f92672">=</span> DataLoader(test_dataset, batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">32</span>, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> train_dataloader, test_dataloader
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_dataloader, test_dataloader <span style="color:#f92672">=</span> prepare_data(X_train, X_test, y_train, y_test)
+</span></span></code></pre></div><p>Just making sure that the conversion of data to torch tensors went OK</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Get tensors from dataloader</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">collect_tensors</span>(dataloader: DataLoader) <span style="color:#f92672">-&gt;</span> tuple[torch<span style="color:#f92672">.</span>Tensor, torch<span style="color:#f92672">.</span>Tensor, torch<span style="color:#f92672">.</span>Tensor]:
+</span></span><span style="display:flex;"><span>    X_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    y_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    mask_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> X, y, mask <span style="color:#f92672">in</span> dataloader:
+</span></span><span style="display:flex;"><span>        X_list<span style="color:#f92672">.</span>append(X)
+</span></span><span style="display:flex;"><span>        y_list<span style="color:#f92672">.</span>append(y) 
+</span></span><span style="display:flex;"><span>        mask_list<span style="color:#f92672">.</span>append(mask)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> torch<span style="color:#f92672">.</span>cat(X_list), torch<span style="color:#f92672">.</span>cat(y_list), torch<span style="color:#f92672">.</span>cat(mask_list)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_train_tensor, y_train_tensor, train_input_mask <span style="color:#f92672">=</span> collect_tensors(train_dataloader)
+</span></span><span style="display:flex;"><span>X_test_tensor, y_test_tensor, test_input_mask <span style="color:#f92672">=</span> collect_tensors(test_dataloader)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Apply baseline_pipeline to X_train_tensor and X_test_tensor</span>
+</span></span><span style="display:flex;"><span>baseline_pipeline<span style="color:#f92672">.</span>fit(X_train_tensor<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>numpy(), y_train_tensor<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>numpy())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Predict on the test set</span>
+</span></span><span style="display:flex;"><span>y_pred_tensor <span style="color:#f92672">=</span> baseline_pipeline<span style="color:#f92672">.</span>predict(X_test_tensor<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>numpy())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Calculate the test score</span>
+</span></span><span style="display:flex;"><span>test_score_tensor: float <span style="color:#f92672">=</span> get_scorer(paradigm<span style="color:#f92672">.</span>scoring)(baseline_pipeline, X_test_tensor<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>numpy(), y_test_tensor<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>numpy())
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Test ROC-AUC XDAWN+LDA: </span><span style="color:#e6db74">{</span>test_score_tensor<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Test ROC-AUC XDAWN+LDA: 0.9788147668393783
+</code></pre>
+<h3 id="calculate-moment-embeddings">Calculate MOMENT embeddings<a href="#calculate-moment-embeddings" class="hanchor" ariaLabel="Anchor">#</a> </h3>
+<p>We calculate the embeddings for each channel individually. It’s important to note that this setup is inherently biased against MOMENT, as it isn’t trained to learn across channels. To address this, we reshape the data so that each channel’s embedding is obtained separately, and then we concatenate these embeddings. Consequently, the baseline pipeline extracts inter-channel information, while MOMENT does not.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> tqdm <span style="color:#f92672">import</span> tqdm
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> momentfm <span style="color:#f92672">import</span> MOMENTPipeline
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_embedding</span>(model, dataloader):
+</span></span><span style="display:flex;"><span>    embeddings, labels <span style="color:#f92672">=</span> [], []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> torch<span style="color:#f92672">.</span>no_grad():
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> batch_x, batch_labels, batch_mask <span style="color:#f92672">in</span> tqdm(dataloader, total<span style="color:#f92672">=</span>len(dataloader)):
+</span></span><span style="display:flex;"><span>            batch_size, n_channels, n_timesteps <span style="color:#f92672">=</span> batch_x<span style="color:#f92672">.</span>shape
+</span></span><span style="display:flex;"><span>            batch_x <span style="color:#f92672">=</span> batch_x<span style="color:#f92672">.</span>reshape(batch_size <span style="color:#f92672">*</span> n_channels, <span style="color:#ae81ff">1</span>, n_timesteps)<span style="color:#f92672">.</span>to(TORCH_DEVICE)
+</span></span><span style="display:flex;"><span>            batch_mask <span style="color:#f92672">=</span> batch_mask<span style="color:#f92672">.</span>to(TORCH_DEVICE)
+</span></span><span style="display:flex;"><span>            output <span style="color:#f92672">=</span> model(x_enc<span style="color:#f92672">=</span>batch_x) <span style="color:#75715e"># [batch_size * n_channels x emb_dim]</span>
+</span></span><span style="display:flex;"><span>            embedding <span style="color:#f92672">=</span> output<span style="color:#f92672">.</span>embeddings<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>reshape(batch_size, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#75715e"># [batch_size x n_channels * emb_dim]</span>
+</span></span><span style="display:flex;"><span>            embeddings<span style="color:#f92672">.</span>append(embedding)
+</span></span><span style="display:flex;"><span>            labels<span style="color:#f92672">.</span>append(batch_labels)        
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    embeddings, labels <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>concatenate(embeddings), np<span style="color:#f92672">.</span>concatenate(labels)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> embeddings, labels
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> MOMENTPipeline<span style="color:#f92672">.</span>from_pretrained(
+</span></span><span style="display:flex;"><span>    MODEL_NAME, 
+</span></span><span style="display:flex;"><span>    model_kwargs<span style="color:#f92672">=</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;task_name&#39;</span>: <span style="color:#e6db74">&#39;embedding&#39;</span>,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>init()
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>to(TORCH_DEVICE)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_embeddings, train_labels <span style="color:#f92672">=</span> get_embedding(model, train_dataloader)
+</span></span><span style="display:flex;"><span>test_embeddings, test_labels <span style="color:#f92672">=</span> get_embedding(model, test_dataloader)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(train_embeddings<span style="color:#f92672">.</span>shape, train_labels<span style="color:#f92672">.</span>shape)
+</span></span><span style="display:flex;"><span>print(test_embeddings<span style="color:#f92672">.</span>shape, test_labels<span style="color:#f92672">.</span>shape)
+</span></span></code></pre></div><pre><code>(2998, 4608) (2998,)
+(1285, 4608) (1285,)
+</code></pre>
+<h3 id="step-downstream-classification">Step: Downstream classification<a href="#step-downstream-classification" class="hanchor" ariaLabel="Anchor">#</a> </h3>
+<p>We use an LDA and hyperparameter optimized SVM</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> momentfm.models.statistical_classifiers <span style="color:#f92672">import</span> fit_svm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>moment_lda_pipeline <span style="color:#f92672">=</span> make_pipeline(
+</span></span><span style="display:flex;"><span>    LDA(solver<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lsqr&#39;</span>, shrinkage<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;auto&#39;</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>moment_lda_pipeline<span style="color:#f92672">.</span>fit(train_embeddings, train_labels)
+</span></span><span style="display:flex;"><span>y_pred <span style="color:#f92672">=</span> moment_lda_pipeline<span style="color:#f92672">.</span>predict(test_embeddings)
+</span></span><span style="display:flex;"><span>test_score <span style="color:#f92672">=</span> get_scorer(paradigm<span style="color:#f92672">.</span>scoring)(moment_lda_pipeline, test_embeddings, test_labels)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Test ROC-AUC MOMENT+LDA: </span><span style="color:#e6db74">{</span>test_score<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Test ROC-AUC MOMENT+LDA: 0.609520725388601
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>moment_svm_pipeline <span style="color:#f92672">=</span> fit_svm(train_embeddings, train_labels)
+</span></span><span style="display:flex;"><span>y_pred <span style="color:#f92672">=</span> moment_svm_pipeline<span style="color:#f92672">.</span>predict(test_embeddings)
+</span></span><span style="display:flex;"><span>test_score <span style="color:#f92672">=</span> get_scorer(paradigm<span style="color:#f92672">.</span>scoring)(moment_svm_pipeline, test_embeddings, test_labels)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Test ROC-AUC MOMENT+SVM: </span><span style="color:#e6db74">{</span>test_score<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Test ROC-AUC MOMENT+SVM: 0.549556347150259
+</code></pre>
+<p>Well, that is not very good. I suspect that it has to do with the dimensionality of the input data (number of channels x the number of embedding dimensions). Let me try once again but this time applying PCA before the LDA classifier to reduce the number of input dimensions by 90%.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.decomposition <span style="color:#f92672">import</span> PCA
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>moment_lda_pipeline <span style="color:#f92672">=</span> make_pipeline(
+</span></span><span style="display:flex;"><span>    PCA(n_components<span style="color:#f92672">=</span>int(train_embeddings<span style="color:#f92672">.</span>shape[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.1</span>)),
+</span></span><span style="display:flex;"><span>    LDA(solver<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lsqr&#39;</span>, shrinkage<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;auto&#39;</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>moment_lda_pipeline<span style="color:#f92672">.</span>fit(train_embeddings, train_labels)
+</span></span><span style="display:flex;"><span>y_pred <span style="color:#f92672">=</span> moment_lda_pipeline<span style="color:#f92672">.</span>predict(test_embeddings)
+</span></span><span style="display:flex;"><span>test_score <span style="color:#f92672">=</span> get_scorer(paradigm<span style="color:#f92672">.</span>scoring)(moment_lda_pipeline, test_embeddings, test_labels)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Test ROC-AUC MOMENT+PCA+LDA: </span><span style="color:#e6db74">{</span>test_score<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Test ROC-AUC MOMENT+PCA+LDA: 0.6235427461139896
+</code></pre>
+<p>It improved, although not as much as I would have expected.</p>
+<h3 id="step-dimensionality-reduction-before-embeddings">Step: Dimensionality reduction before embeddings<a href="#step-dimensionality-reduction-before-embeddings" class="hanchor" ariaLabel="Anchor">#</a> </h3>
+<p>I want to try one last thing. Since MOMENT is still not built to merge information across channels, we will help it a bit by spatially filtering the data <em>before</em> calculating the embeddings. This should substantially increase the classification score.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>x_dawn <span style="color:#f92672">=</span> Xdawn(nfilter<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>X_train_filtered <span style="color:#f92672">=</span> x_dawn<span style="color:#f92672">.</span>fit_transform(X_train, y_train)
+</span></span><span style="display:flex;"><span>X_test_filtered <span style="color:#f92672">=</span> x_dawn<span style="color:#f92672">.</span>transform(X_test)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_dataloader_filtered, test_dataloader_filtered <span style="color:#f92672">=</span> prepare_data(X_train_filtered, X_test_filtered, y_train, y_test)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_embeddings_filtered, train_labels_filtered <span style="color:#f92672">=</span> get_embedding(model, train_dataloader_filtered)
+</span></span><span style="display:flex;"><span>test_embeddings_filtered, test_labels_filtered <span style="color:#f92672">=</span> get_embedding(model, test_dataloader_filtered)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>moment_lda_pipeline <span style="color:#f92672">=</span> make_pipeline(
+</span></span><span style="display:flex;"><span>    LDA(solver<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lsqr&#39;</span>, shrinkage<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;auto&#39;</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>moment_lda_pipeline<span style="color:#f92672">.</span>fit(train_embeddings_filtered, train_labels_filtered)
+</span></span><span style="display:flex;"><span>y_pred <span style="color:#f92672">=</span> moment_lda_pipeline<span style="color:#f92672">.</span>predict(test_embeddings_filtered)
+</span></span><span style="display:flex;"><span>test_score <span style="color:#f92672">=</span> get_scorer(paradigm<span style="color:#f92672">.</span>scoring)(moment_lda_pipeline, test_embeddings_filtered, test_labels_filtered)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Test ROC-AUC Xdawn+MOMENT+LDA: </span><span style="color:#e6db74">{</span>test_score<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><pre><code>Test ROC-AUC Xdawn+MOMENT+LDA: 0.8285330310880828
+</code></pre>
+<p>Aha! the assumption of inter-channel independence in MOMENT appears to be a significant challenge. While we’re still not reaching the baseline’s 0.97 ROC-AUC, we’ve seen a clear improvement from 0.64 to 0.81 by spatially mixing the channels and, thus, reducing the channel count before calculating embeddings.</p>
+<h4 id="remaining-considerations-for-this-exercise">Remaining considerations for this exercise:<a href="#remaining-considerations-for-this-exercise" class="hanchor" ariaLabel="Anchor">#</a> </h4>
+<ol>
+<li>Cross-subject, cross-session: I still wonder who well these embeddings work if we merge the data across different subjects. This is still a challenging topic in the BCI community. In our case, I suspect that adding cross subject data could even improve the performance, since it seems that we are still under the curse of dimensionality.</li>
+<li>Generalizability to other experiments: It would be interesting to test if this pipeline can adapt to different types of experiments. For instance, in scenarios where discriminative features are not specific amplitude peaks (like N100 or P300) but other characteristics—such as power increases within a specific frequency band over longer periods of time, as seen in Motor Imagery experiments. This is actually one of the main selling points of foundation models: decent zero-shot performance across tasks, so it would make sense to try this one out.</li>
+</ol>
+<p>I plan to explore this further in the future, but I’ll leave it here for now.</p>
+<h1 id="tldr">TLDR;<a href="#tldr" class="hanchor" ariaLabel="Anchor">#</a> </h1>
+<ul>
+<li>This year there has been a surge in general-purpose foundation models for time series, along side the emergence of domain-specific models from companies like [Piramidal](<a href="https://piramidal.ai/-">https://piramidal.ai/-</a> a YC-backed company, raising $6.5M for the foundational model <em>specifically</em> for Electroencephalographic (EEG)</li>
+<li>This post is a personal exploration exercise to see how these general-purpose models perform with data for which domain-specific models are being built. <em>It is not intended as a throughout benchmark.</em></li>
+<li>For this, I chose <a href="https://github.com/moment-timeseries-foundation-model/moment-research"><strong>MOMENT</strong></a>, one of the general-purpose foundation models released this year, and tested its zero-shot performance in a common brain-computer interface classification task.</li>
+<li>The results are mixed: MOMENT did not achieved the domain-specific baseline. But to be fair, the baseline is already very high.</li>
+<li>This is probably due to the limitations on how multi-channel data is processed in MOMENT. If we factor out this, the classification performance increases from around 0.6 to 0.8. Not bad 🙂</li>
+<li>The code can be found <a href="https://github.com/jscastanoc/castano-blog-notebooks/blob/main/fmodel-ts-classification/moment-bci.ipynb">here</a></li>
+<li>My takeaway is that the model is very promising, although the way multi-channel data is dealt with should be honed.</li>
+<li>I’m still itching to find out how MOMENT would handle other type of BCI experiments that tap into different brain responses—like Motor Imagery instead of Evoked Potentials. But I will leave this one for another post 👋🏽</li>
+</ul>
+<h1 id="sources">Sources<a href="#sources" class="hanchor" ariaLabel="Anchor">#</a> </h1>
+<ul>
+<li><a href="https://arxiv.org/pdf/2405.02358">A Survey of Time Series Foundation Models: Generalizing Time Series Representation with Large Language Model</a></li>
+<li><a href="https://developer.ibm.com/tutorials/awb-foundation-model-time-series-forecasting/">Using foundation models for time series forecasting</a></li>
+<li><a href="https://neurips-time-series-workshop.github.io/">NeurIPS workshop: Time Series in the Age of Large Models</a></li>
+<li><a href="https://arxiv.org/abs/2403.14735">Foundation Models for Time Series Analysis: A Tutorial and Survey</a></li>
+<li><a href="https://towardsdatascience.com/exploring-the-latest-advances-in-foundation-time-series-models-3fc8431ab7bd">Exploring the Latest Advances in Foundation Time-Series Models</a></li>
+<li><a href="https://www.reddit.com/r/datascience/comments/1e865bt/the_rise_of_foundation_timeseries_forecasting/">The Rise of Foundation Time-Series Forecasting Models</a></li>
+<li><a href="https://www.datadoghq.com/blog/datadog-time-series-foundation-model/">Introducing Toto: A state-of-the-art time series foundation model by Datadog</a></li>
+<li><a href="https://blog.salesforceairesearch.com/moirai/">https://blog.salesforceairesearch.com/moirai/</a></li>
+<li><a href="https://arxiv.org/abs/2407.13278">Deep Time Series Models: A Comprehensive Survey and Benchmark</a></li>
+<li><a href="https://www.adesso.de/en/news/blog/foundation-models-for-time-series-applications-an-overview-of-the-leading-technologies.jsp">https://www.adesso.de/en/news/blog/foundation-models-for-time-series-applications-an-overview-of-the-leading-technologies.jsp</a></li>
+</ul>
+
+      </div></div>
+
+  
+
+  
+    
+
+  
+</article>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    
+      <div class="copyright">
+        <span>© 2024 Powered by <a href="https://gohugo.io">Hugo</a></span>
+    
+      <span>:: <a href="https://github.com/panr/hugo-theme-terminal" target="_blank">Theme</a> made by <a href="https://github.com/panr" target="_blank">panr</a></span>
+      </div>
+  </div>
+</footer>
+
+
+
+
+
+
+<script type="text/javascript" src="../../bundle.min.js"></script>
+
+
+
+
+
+  
+</div>
+
+</body>
+</html>
